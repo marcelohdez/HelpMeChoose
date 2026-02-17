@@ -4,27 +4,49 @@ import { Column } from "@/components/Column";
 import { useState } from "react";
 
 const Home = () => {
-  const [columns, setColumns] = useState<number[]>([]);
+  const [columns, setColumns] = useState([0, 1]);
+  const [id, setId] = useState(columns.length);
 
-  const add = () =>
-    columns.length < 5
-      ? setColumns(columns.concat(columns.length + 1))
-      : console.log("Maximum number of columns reacehed.");
+  const canAdd = () => columns.length < 5;
+  const canRemove = () => columns.length > 2;
+
+  const add = () => {
+    if (canAdd()) {
+      setId(id + 1);
+      setColumns(columns.concat(id));
+    } else {
+      console.log("Maximum number of columns reacehed.");
+    }
+  };
+
+  const remove = (idx: number) =>
+    canRemove()
+      ? setColumns(columns.filter((_, i) => i != idx))
+      : console.log("You already have the minimum amount of columns.");
 
   return (
-    <div className="flex items-center flex-col gap-2 sm:gap-4">
+    <div className="flex items-center flex-col">
       <button
-        className="rounded-md py-1 px-2 opacity-50 hover:opacity-100 hover:bg-neutral-500/10"
+        className={`rounded-md border-2 border-neutral-50/0 py-1 px-2 opacity-50 ${
+          canAdd()
+            ? "hover:opacity-100 hover:border-neutral-500/20 hover:bg-neutral-500/10"
+            : ""
+        }`}
         onClick={() => add()}
       >
         + Column
       </button>
       <div
-        className="flex w-full max-w-7xl justify-center-safe overflow-scroll px-2 sm:px-4
-        gap-2 sm:gap-4"
+        className="flex w-full max-w-7xl justify-center-safe overflow-x-scroll p-2 sm:p-4
+        pt-6 sm:pt-8 gap-2 sm:gap-4 "
       >
         {columns.map((x, i) => (
-          <Column key={i} title={x.toString()} />
+          <Column
+            key={x}
+            id={x.toString()}
+            onDelete={() => remove(i)}
+            canDelete={canRemove}
+          />
         ))}
       </div>
       <div>Decision: one</div>

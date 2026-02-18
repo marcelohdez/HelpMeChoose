@@ -25,7 +25,7 @@ const Home = () => {
       : console.log("You already have the minimum amount of columns.");
 
   return (
-    <div className="flex items-center flex-col">
+    <div className="flex grow items-center flex-col">
       <button
         className={`rounded-md border-2 border-neutral-50/0 py-1 px-2 opacity-50 ${
           canAdd()
@@ -34,11 +34,11 @@ const Home = () => {
         }`}
         onClick={() => add()}
       >
-        + Column
+        {canAdd() ? "+ Column" : "Max Columns"}
       </button>
       <div
-        className="flex w-full max-w-7xl justify-center-safe overflow-x-scroll p-2 sm:p-4
-        pt-6 sm:pt-8 gap-2 sm:gap-4 "
+        className="flex grow w-full max-w-7xl justify-center-safe overflow-x-scroll
+        p-2 sm:p-4 pt-6 sm:pt-8 gap-2 sm:gap-4"
       >
         {columns.map((x, i) => (
           <Column
@@ -49,7 +49,6 @@ const Home = () => {
           />
         ))}
       </div>
-      <div>Decision: one</div>
     </div>
   );
 };

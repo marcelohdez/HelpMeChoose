@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { FaGripVertical, FaTrash } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 import { FaX } from "react-icons/fa6";
 import { AttributeDialog } from "./AttributeDialog";
+import assert from "assert";
 
 interface ColumnProps {
   id: string;
@@ -11,11 +12,29 @@ interface ColumnProps {
   canDelete: () => boolean;
 }
 
-const fadeGroupCss = (group: string) =>
-  `opacity-0 pointer-coarse:opacity-30 group-hover/${group}:opacity-30 hover:opacity-100`;
+interface Attribute {
+  id: number;
+  title: string;
+  value: number;
+}
+
+const FADE_CSS = "opacity-0 pointer-coarse:opacity-30 hover:opacity-100";
+
+const attributeBgCss = (value: number, range: number = 1) => {
+  assert(range > 0);
+
+  let result = "bg-neutral-200 dark:bg-neutral-700/50";
+  if (value <= -range) {
+    result = "bg-red-500/20 dark:bg-red-400/10";
+  } else if (value >= range) {
+    result = "bg-green-500/20 dark:bg-green-400/10";
+  }
+
+  return result;
+};
 
 const Column = (props: ColumnProps) => {
-  const [attributes, setAttributes] = useState<[number, string][]>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [attributeId, setAttributeId] = useState(0);
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -24,10 +43,10 @@ const Column = (props: ColumnProps) => {
 
   const canAdd = () => attributes.length < 20;
 
-  const add = (title: string) => {
+  const add = (title: string, value: number) => {
     if (canAdd()) {
       setAttributeId(attributeId + 1);
-      setAttributes([...attributes, [attributeId, title]]);
+      setAttributes(attributes.concat({ id: attributeId, title, value }));
     } else {
       console.log("Maximum number of attributes reached.");
     }
@@ -49,14 +68,15 @@ const Column = (props: ColumnProps) => {
           😐
         </div>
         <div className="grid grid-cols-3 sm:p-1">
-          <button className="justify-self-start opacity-30 hover:cursor-grab">
-            <FaGripVertical />
-          </button>
-          <p className="justify-self-center">{props.id}</p>
+          {/* TODO: Implement dragging */}
+          {/* <button className="justify-self-start opacity-30 hover:cursor-grab"> */}
+          {/*   <FaGripVertical /> */}
+          {/* </button> */}
+          <p className="justify-self-center col-start-2">{props.id}</p>
           <button
             className={
               props.canDelete()
-                ? `${fadeGroupCss("column")} justify-self-end`
+                ? `${FADE_CSS} group-hover/column:opacity-30  justify-self-end col-start-3`
                 : "hidden"
             }
             onClick={() => props.onDelete()}
@@ -67,13 +87,13 @@ const Column = (props: ColumnProps) => {
         <ul className="flex flex-col gap-2">
           {attributes.map((x, i) => (
             <li
-              key={x[0]}
-              className="flex justify-between gap-2 rounded-md py-1 px-2 md:py-2 md:px-4
-            bg-neutral-200 dark:bg-neutral-700/50 shadow-md group/attribute"
+              key={x.id}
+              className={`flex justify-between gap-2 rounded-md py-1 px-2 md:py-2 md:px-4
+                shadow-md group/attribute ${attributeBgCss(x.value)}`}
             >
-              {x[1]}
+              {x.title}
               <button
-                className={fadeGroupCss("attribute")}
+                className={`${FADE_CSS} group-hover/attribute:opacity-30`}
                 onClick={() => remove(i)}
               >
                 <FaX />

@@ -54,7 +54,7 @@ const Column = (props: ColumnProps) => {
   };
 
   return (
-    <div className="grow max-w-sm min-w-40 sm:min-w-48 md:min-w-52">
+    <div className="flex-1 max-w-sm min-w-40 sm:min-w-48 md:min-w-52">
       <AttributeDialog
         isOpen={dialogOpen}
         onClose={() => setDialogOpen(false)}

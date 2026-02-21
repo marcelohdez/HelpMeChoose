@@ -2,7 +2,9 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useReducer,
+  useRef,
   useState,
 } from "react";
 
@@ -15,6 +17,7 @@ type DialogAction =
   | null;
 
 type ColumnAction =
+  | { type: "load"; columns: Column[] }
   | { type: "add-row"; columnId: string; title: string; value: number }
   | {
       type: "edit-row";
@@ -29,6 +32,9 @@ type ColumnAction =
 
 const dialogReducer = (state: Column[], action: ColumnAction): Column[] => {
   switch (action.type) {
+    case "load":
+      return action.columns;
+
     case "add-row":
       return state.map((col) =>
         col.id !== action.columnId
@@ -86,6 +92,25 @@ const BoardContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [columns, dispatch] = useReducer(dialogReducer, []);
   const [dialogState, setDialogState] = useState<DialogAction>(null);
 
+  // load from storage
+  useEffect(() => {
+    const saved = localStorage.getItem("board0");
+    if (saved) {
+      dispatch({ type: "load", columns: JSON.parse(saved) });
+    }
+  }, []);
+
+  // save columns to storage whenever they're changed
+  const firstDraw = useRef(true);
+  useEffect(() => {
+    if (firstDraw.current) {
+      firstDraw.current = false;
+      return;
+    }
+
+    localStorage.setItem("board0", JSON.stringify(columns));
+  }, [columns]);
+
   return (
     <BoardContext.Provider
       value={{
@@ -107,4 +132,4 @@ const useBoardContext = () => {
   return ctx;
 };
 
-export { BoardContextProvider as DecisionContextProvider, useBoardContext };
+export { BoardContextProvider, useBoardContext };

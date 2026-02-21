@@ -1,13 +1,13 @@
 "use client";
 
-import { DecisionContextProvider } from "./context";
+import { BoardContextProvider } from "./context";
 import { Board } from "@/components/Board";
 
 const Home = () => {
   return (
-    <DecisionContextProvider>
+    <BoardContextProvider>
       <Board />
-    </DecisionContextProvider>
+    </BoardContextProvider>
   );
 };
 

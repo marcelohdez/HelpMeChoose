@@ -1,65 +1,68 @@
 "use client";
 
-import { SubmitEvent, useEffect, useRef, useState } from "react";
+import { useBoardContext } from "@/app/context";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-interface AttributeDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (title: string, value: number) => void;
-}
-
-const AttributeDialog = (props: AttributeDialogProps) => {
-  const [mounted, setMounted] = useState(false);
+const ReasonDialog = () => {
+  const { dialog, columns, dispatch, closeDialog } = useBoardContext();
   const [title, setTitle] = useState("");
   const [value, setValue] = useState(0);
   const titleRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    props.onSubmit(title, value);
-    setTitle("");
-    setValue(0);
-  };
-
-  // handle mounting, next-ism
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    // fill in values if editing
+    if (dialog?.type === "edit-row") {
+      const col = columns.find((c) => c.id === dialog.columnId);
+      const row = col?.rows.find((r) => r.id === dialog.rowId);
+      setTitle(row?.title ?? "");
+      setValue(row?.value ?? 0);
+    } else {
+      setTitle("");
+      setValue(0);
+    }
 
-  // focus on title when we are open
-  useEffect(() => {
-    if (props.isOpen && titleRef.current) {
+    // focus on title textbox
+    if (titleRef.current) {
       titleRef.current.focus();
     }
-  }, [props.isOpen, mounted]);
+  }, [dialog]);
 
   // add escape handler to document
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        props.onClose();
-      }
-    };
+    const handler = (e: KeyboardEvent) =>
+      e.key === "Escape" ? closeDialog() : null;
 
-    if (props.isOpen) {
-      document.addEventListener("keydown", handler);
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [closeDialog]);
+
+  if (!dialog) return null;
+
+  const handleSubmit = () => {
+    if (!title.trim()) return;
+
+    if (dialog.type === "add-row") {
+      dispatch({ type: "add-row", columnId: dialog.columnId, title, value });
+    } else if (dialog.type === "edit-row") {
+      dispatch({
+        type: "edit-row",
+        columnId: dialog.columnId,
+        rowId: dialog.rowId,
+        title,
+        value,
+      });
     }
 
-    return () => document.removeEventListener("keydown", handler);
-  }, [props.isOpen, props.onClose]);
-
-  // next-ism
-  if (!mounted) return null;
+    closeDialog();
+  };
 
   return createPortal(
     <div
-      className={`${props.isOpen || "hidden"} fixed w-full h-full bg-black/50 backdrop-blur-xs
+      className={`${dialog || "hidden"} fixed w-full h-full bg-black/50 backdrop-blur-xs
         top-0 flex justify-center items-center`}
       onClick={(e) => {
-        if (e.target == e.currentTarget) props.onClose();
+        if (e.target == e.currentTarget) closeDialog();
       }}
     >
       <form
@@ -67,7 +70,7 @@ const AttributeDialog = (props: AttributeDialogProps) => {
         className="flex flex-col gap-2 rounded-md p-2 px-4 border-2 border-neutral-300/50 dark:border-neutral-700/50
         bg-neutral-300 dark:bg-neutral-800 shadow-md"
       >
-        <div className="text-center">New Attribute</div>
+        <div className="text-center">New Reason</div>
         <input
           className="py-1 px-2 rounded-sm bg-neutral-200 dark:bg-neutral-700"
           placeholder="Title"
@@ -104,4 +107,4 @@ const AttributeDialog = (props: AttributeDialogProps) => {
   );
 };
 
-export { AttributeDialog };
+export { ReasonDialog };

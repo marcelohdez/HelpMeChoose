@@ -1,26 +1,20 @@
 "use client";
 
-import { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { FaX } from "react-icons/fa6";
-import { AttributeDialog } from "./AttributeDialog";
 import assert from "assert";
+import { useBoardContext } from "@/app/context";
 
 interface ColumnProps {
   id: string;
+  title: string;
   onDelete: () => void;
   canDelete: () => boolean;
 }
 
-interface Attribute {
-  id: number;
-  title: string;
-  value: number;
-}
-
 const FADE_CSS = "opacity-0 pointer-coarse:opacity-30 hover:opacity-100";
 
-const attributeBgCss = (value: number, range: number = 1) => {
+const rowBgCss = (value: number, range: number = 1) => {
   assert(range > 0);
 
   let result = "bg-neutral-200 dark:bg-neutral-700/50";
@@ -34,32 +28,15 @@ const attributeBgCss = (value: number, range: number = 1) => {
 };
 
 const Column = (props: ColumnProps) => {
-  const [attributes, setAttributes] = useState<Attribute[]>([]);
-  const [attributeId, setAttributeId] = useState(0);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const { columns, dispatch, openDialog } = useBoardContext();
+  const column = columns.find((c) => c.id === props.id);
 
-  const remove = (idx: number) =>
-    setAttributes(attributes.filter((_, i) => i != idx));
+  if (!column) return null;
 
-  const canAdd = () => attributes.length < 20;
-
-  const add = (title: string, value: number) => {
-    if (canAdd()) {
-      setAttributeId(attributeId + 1);
-      setAttributes(attributes.concat({ id: attributeId, title, value }));
-    } else {
-      console.log("Maximum number of attributes reached.");
-    }
-    setDialogOpen(false);
-  };
+  const canAdd = () => column?.rows.length < 20;
 
   return (
     <div className="flex-1 max-w-sm min-w-40 sm:min-w-48 md:min-w-52">
-      <AttributeDialog
-        isOpen={dialogOpen}
-        onClose={() => setDialogOpen(false)}
-        onSubmit={add}
-      />
       <div
         className="flex flex-col rounded-lg gap-2 bg-neutral-100 dark:bg-neutral-800 p-2 sm:px-4
         border-2 border-neutral-300/50 dark:border-neutral-700/50 shadow-md group/column"
@@ -72,7 +49,7 @@ const Column = (props: ColumnProps) => {
           {/* <button className="justify-self-start opacity-30 hover:cursor-grab"> */}
           {/*   <FaGripVertical /> */}
           {/* </button> */}
-          <p className="justify-self-center col-start-2">{props.id}</p>
+          <p className="justify-self-center col-start-2">{props.title}</p>
           <button
             className={
               props.canDelete()
@@ -85,16 +62,25 @@ const Column = (props: ColumnProps) => {
           </button>
         </div>
         <ul className="flex flex-col gap-2">
-          {attributes.map((x, i) => (
+          {column.rows.map((x) => (
             <li
               key={x.id}
               className={`flex justify-between gap-2 rounded-md py-1 px-2 md:py-2 md:px-4
-                shadow-md group/attribute ${attributeBgCss(x.value)}`}
+                shadow-md group/row ${rowBgCss(x.value)}`}
+              onClick={() =>
+                openDialog({
+                  type: "edit-row",
+                  columnId: column.id,
+                  rowId: x.id,
+                })
+              }
             >
               {x.title}
               <button
-                className={`${FADE_CSS} group-hover/attribute:opacity-30`}
-                onClick={() => remove(i)}
+                className={`${FADE_CSS} group-hover/row:opacity-30`}
+                onClick={() =>
+                  dispatch({ type: "remove-col", columnId: column.id })
+                }
               >
                 <FaX />
               </button>
@@ -105,9 +91,9 @@ const Column = (props: ColumnProps) => {
           className={`text-left opacity-50 rounded-md py-1 px-2 ${
             canAdd() ? "hover:bg-neutral-500/10 hover:opacity-100" : "hidden"
           }`}
-          onClick={() => setDialogOpen(true)}
+          onClick={() => openDialog({ type: "add-row", columnId: column.id })}
         >
-          + Attribute
+          + Reason
         </button>
       </div>
     </div>

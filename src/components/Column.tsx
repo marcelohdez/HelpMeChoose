@@ -88,19 +88,25 @@ const Column = (props: ColumnProps) => {
               key={x.id}
               className={`flex justify-between gap-2 rounded-md py-1 px-2 md:py-2 md:px-4
                 shadow-md group/row ${rowBgCss(x.value)}`}
-              onClick={() =>
-                openDialog({
-                  type: "edit-row",
-                  columnId: column.id,
-                  rowId: x.id,
-                })
-              }
+              onClick={(e) => {
+                if (e.target == e.currentTarget) {
+                  openDialog({
+                    type: "edit-row",
+                    columnId: column.id,
+                    rowId: x.id,
+                  });
+                }
+              }}
             >
               {x.title}
               <button
                 className={`${FADE_CSS} group-hover/row:opacity-30`}
                 onClick={() =>
-                  dispatch({ type: "remove-col", columnId: column.id })
+                  dispatch({
+                    type: "remove-row",
+                    columnId: column.id,
+                    rowId: x.id,
+                  })
                 }
               >
                 <FaX />

@@ -23,6 +23,7 @@ type ColumnAction =
       title: string;
       value: number;
     }
+  | { type: "remove-row"; columnId: string; rowId: string }
   | { type: "add-col"; title: string }
   | { type: "remove-col"; columnId: string };
 
@@ -55,6 +56,12 @@ const dialogReducer = (state: Column[], action: ColumnAction): Column[] => {
               ),
             },
       );
+
+    case "remove-row":
+      return state.map((col) => ({
+        ...col,
+        rows: col.rows.filter((row) => row.id !== action.rowId),
+      }));
 
     case "add-col":
       return [

@@ -4,6 +4,7 @@ import { FaTrash } from "react-icons/fa";
 import { FaX } from "react-icons/fa6";
 import assert from "assert";
 import { useBoardContext } from "@/app/context";
+import { useEffect, useState } from "react";
 
 interface ColumnProps {
   id: string;
@@ -27,9 +28,29 @@ const rowBgCss = (value: number, range: number = 1) => {
   return result;
 };
 
+const getEmoji = (value: number) => {
+  if (value < 0) {
+    return "🙅";
+  } else if (value > 0) {
+    return "☺️";
+  }
+
+  return "😐";
+};
+
 const Column = (props: ColumnProps) => {
   const { columns, dispatch, openDialog } = useBoardContext();
   const column = columns.find((c) => c.id === props.id);
+
+  const [value, setValue] = useState(0);
+
+  useEffect(
+    () =>
+      setValue(
+        column?.rows.map((row) => row.value).reduce((t, x) => t + x, 0)!,
+      ),
+    [column],
+  );
 
   if (!column) return null;
 
@@ -42,7 +63,7 @@ const Column = (props: ColumnProps) => {
         border-2 border-neutral-300/50 dark:border-neutral-700/50 shadow-md group/column"
       >
         <div className="text-center text-4xl md:text-5xl -mt-6 sm:-mt-8">
-          😐
+          {getEmoji(value)}
         </div>
         <div className="grid grid-cols-3 sm:p-1">
           {/* TODO: Implement dragging */}

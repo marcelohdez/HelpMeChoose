@@ -1,7 +1,7 @@
 "use client";
 
 import { useBoardContext } from "@/app/context";
-import { useEffect, useRef, useState } from "react";
+import { SubmitEvent, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 const InputDialog = () => {
@@ -12,7 +12,10 @@ const InputDialog = () => {
 
   useEffect(() => {
     // fill in values if editing
-    if (dialog?.type === "edit-row") {
+    if (dialog?.type === "edit-col") {
+      const col = columns.find((c) => c.id === dialog.columnId);
+      setTitle(col?.title ?? "");
+    } else if (dialog?.type === "edit-row") {
       const col = columns.find((c) => c.id === dialog.columnId);
       const row = col?.rows.find((r) => r.id === dialog.rowId);
       setTitle(row?.title ?? "");

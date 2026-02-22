@@ -71,7 +71,7 @@ const InputDialog = () => {
 
   return createPortal(
     <div
-      className={`${dialog || "hidden"} fixed w-full h-full bg-black/50 backdrop-blur-xs
+      className={`${dialog || "hidden"} fixed w-dvw h-dvh bg-black/40 backdrop-blur-xs
         top-0 flex justify-center items-center`}
       onClick={(e) => {
         if (e.target == e.currentTarget) closeDialog();
@@ -79,7 +79,7 @@ const InputDialog = () => {
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-2 rounded-lg py-2 px-4 border-2 border-neutral-300/50 dark:border-neutral-700/50
+        className="flex flex-col gap-2 rounded-xl py-2 px-4 border-2 border-neutral-300/50 dark:border-neutral-700/50
         bg-neutral-300 dark:bg-neutral-800 shadow-md"
       >
         <div className="text-center">

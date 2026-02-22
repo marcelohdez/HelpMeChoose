@@ -59,7 +59,7 @@ const Column = (props: ColumnProps) => {
   return (
     <div className="flex-1 max-w-sm min-w-40 sm:min-w-48 md:min-w-52">
       <div
-        className="flex flex-col rounded-lg gap-2 bg-neutral-100 dark:bg-neutral-800 p-2 sm:px-4
+        className="flex flex-col rounded-xl gap-2 bg-neutral-100 dark:bg-neutral-800 p-2 sm:px-4
         border-2 border-neutral-300/50 dark:border-neutral-700/50 shadow-md group/column"
       >
         <div className="text-center text-4xl md:text-5xl -mt-6 sm:-mt-8">
@@ -70,7 +70,14 @@ const Column = (props: ColumnProps) => {
           {/* <button className="justify-self-start opacity-30 hover:cursor-grab"> */}
           {/*   <FaGripVertical /> */}
           {/* </button> */}
-          <p className="justify-self-center col-start-2">{props.title}</p>
+          <div
+            className="justify-self-center col-start-2"
+            onClick={() =>
+              openDialog({ type: "edit-col", columnId: column.id })
+            }
+          >
+            {props.title}
+          </div>
           <button
             className={
               props.canDelete()
@@ -86,7 +93,7 @@ const Column = (props: ColumnProps) => {
           {column.rows.map((x) => (
             <li
               key={x.id}
-              className={`flex justify-between gap-2 rounded-md py-1 px-2 md:py-2 md:px-4
+              className={`flex justify-between gap-2 rounded-lg py-1 px-2 md:py-2 md:px-4
                 shadow-md group/row ${rowBgCss(x.value)}`}
               onClick={(e) => {
                 if (e.target == e.currentTarget) {
@@ -115,7 +122,7 @@ const Column = (props: ColumnProps) => {
           ))}
         </ul>
         <button
-          className={`text-left opacity-50 rounded-md py-1 px-2 ${
+          className={`text-left opacity-50 rounded-lg py-1 px-2 ${
             canAdd() ? "hover:bg-neutral-500/10 hover:opacity-100" : "hidden"
           }`}
           onClick={() => openDialog({ type: "add-row", columnId: column.id })}

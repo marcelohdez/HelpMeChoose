@@ -1,16 +1,16 @@
 import { useBoardContext } from "@/app/context";
 import { Column } from "./Column";
-import { ReasonDialog } from "./ReasonDialog";
+import { InputDialog } from "./InputDialog";
 
 const Board = () => {
-  const { columns, dispatch } = useBoardContext();
+  const { columns, dispatch, openDialog } = useBoardContext();
 
   const canAdd = () => columns.length < 5;
   const canRemove = () => columns.length > 2;
 
   const add = () => {
     if (canAdd()) {
-      dispatch({ type: "add-col", title: `Column ${columns.length}` });
+      openDialog({ type: "add-col" });
     } else {
       console.log("Maximum number of columns reacehed.");
     }
@@ -23,9 +23,9 @@ const Board = () => {
 
   return (
     <div className="flex grow items-center flex-col">
-      <ReasonDialog />
+      <InputDialog />
       <button
-        className={`rounded-md border-2 border-neutral-50/0 py-1 px-2 opacity-50 ${
+        className={`rounded-lg border-2 border-neutral-50/0 py-1 px-2 opacity-50 ${
           canAdd()
             ? "hover:opacity-100 hover:border-neutral-500/20 hover:bg-neutral-500/10"
             : ""

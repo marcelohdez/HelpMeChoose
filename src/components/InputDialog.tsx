@@ -4,7 +4,7 @@ import { useBoardContext } from "@/app/context";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
-const ReasonDialog = () => {
+const InputDialog = () => {
   const { dialog, columns, dispatch, closeDialog } = useBoardContext();
   const [title, setTitle] = useState("");
   const [value, setValue] = useState(0);
@@ -42,18 +42,27 @@ const ReasonDialog = () => {
   const handleSubmit = () => {
     if (!title.trim()) return;
 
-    if (dialog.type === "add-row") {
-      dispatch({ type: "add-row", columnId: dialog.columnId, title, value });
-    } else if (dialog.type === "edit-row") {
-      dispatch({
-        type: "edit-row",
-        columnId: dialog.columnId,
-        rowId: dialog.rowId,
-        title,
-        value,
-      });
-    }
+    // scary code but trying to enforce exhaustive type checking
+    const action = () => {
+      switch (dialog.type) {
+        case "add-row":
+          return { type: dialog.type, columnId: dialog.columnId, title, value };
+        case "edit-row":
+          return {
+            type: dialog.type,
+            columnId: dialog.columnId,
+            rowId: dialog.rowId,
+            title,
+            value,
+          };
+        case "add-col":
+          return { type: dialog.type, title };
+        case "edit-col":
+          return { type: dialog.type, columndId: dialog.columnId, title };
+      }
+    };
 
+    dispatch(action());
     closeDialog();
   };
 
@@ -67,12 +76,15 @@ const ReasonDialog = () => {
     >
       <form
         onSubmit={handleSubmit}
-        className="flex flex-col gap-2 rounded-md p-2 px-4 border-2 border-neutral-300/50 dark:border-neutral-700/50
+        className="flex flex-col gap-2 rounded-lg py-2 px-4 border-2 border-neutral-300/50 dark:border-neutral-700/50
         bg-neutral-300 dark:bg-neutral-800 shadow-md"
       >
-        <div className="text-center">New Reason</div>
+        <div className="text-center">
+          {dialog.type.startsWith("add") ? "New" : "Edit"}
+          {dialog.type.endsWith("row") ? " Reason" : " Column"}
+        </div>
         <input
-          className="py-1 px-2 rounded-sm bg-neutral-200 dark:bg-neutral-700"
+          className="py-1 px-2 rounded-md bg-neutral-200 dark:bg-neutral-700"
           placeholder="Title"
           name="title"
           value={title}
@@ -80,23 +92,25 @@ const ReasonDialog = () => {
           ref={titleRef}
           required
         />
-        <div className="flex justify-between">
-          <p>-1</p>
-          <input
-            value={value}
-            onChange={(e) => setValue(Number(e.target.value))}
-            min="-1"
-            max="1"
-            name="value"
-            type="range"
-          />
-          <p>+1</p>
-        </div>
+        {dialog.type.endsWith("col") ? null : (
+          <div className="flex justify-between">
+            <p>-1</p>
+            <input
+              value={value}
+              onChange={(e) => setValue(Number(e.target.value))}
+              min="-1"
+              max="1"
+              name="value"
+              type="range"
+            />
+            <p>+1</p>
+          </div>
+        )}
         <div className="flex justify-center">
           <button
             autoFocus
             type="submit"
-            className="py-1 px-2 rounded-md bg-neutral-200 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700"
+            className="py-1 px-2 rounded-lg bg-neutral-200 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700"
           >
             Save
           </button>
@@ -107,4 +121,4 @@ const ReasonDialog = () => {
   );
 };
 
-export { ReasonDialog };
+export { InputDialog };

@@ -14,6 +14,8 @@ type Column = { id: string; title: string; rows: Row[] };
 type DialogAction =
   | { type: "add-row"; columnId: string }
   | { type: "edit-row"; columnId: string; rowId: string }
+  | { type: "add-col" }
+  | { type: "edit-col"; columnId: string }
   | null;
 
 type ColumnAction =
@@ -28,6 +30,7 @@ type ColumnAction =
     }
   | { type: "remove-row"; columnId: string; rowId: string }
   | { type: "add-col"; title: string }
+  | { type: "edit-col"; columndId: string; title: string }
   | { type: "remove-col"; columnId: string };
 
 const dialogReducer = (state: Column[], action: ColumnAction): Column[] => {
@@ -74,6 +77,11 @@ const dialogReducer = (state: Column[], action: ColumnAction): Column[] => {
         ...state,
         { id: crypto.randomUUID(), title: action.title, rows: [] },
       ];
+
+    case "edit-col":
+      return state.map((col) =>
+        col.id !== action.columndId ? col : { ...col, title: action.title },
+      );
 
     case "remove-col":
       return state.filter((col) => col.id !== action.columnId);

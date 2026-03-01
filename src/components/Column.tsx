@@ -1,6 +1,6 @@
 "use client";
 
-import { FaTrash } from "react-icons/fa";
+import { FaGripVertical, FaTrash } from "react-icons/fa";
 import { FaX } from "react-icons/fa6";
 import assert from "assert";
 import { useBoardContext } from "@/app/context";
@@ -65,13 +65,14 @@ const Column = (props: ColumnProps) => {
         <div className="text-center text-4xl md:text-5xl -mt-6 sm:-mt-8">
           {getEmoji(value)}
         </div>
-        <div className="grid grid-cols-3 sm:p-1">
-          {/* TODO: Implement dragging */}
-          {/* <button className="justify-self-start opacity-30 hover:cursor-grab"> */}
-          {/*   <FaGripVertical /> */}
-          {/* </button> */}
+        <div className="flex justify-between gap-2 sm:p-1">
+          <button
+            className={`${FADE_CSS} group-hover/column:opacity-30 justify-self-start hover:cursor-grab`}
+          >
+            <FaGripVertical />
+          </button>
           <div
-            className="justify-self-center col-start-2 hover:bg-neutral-500/20 px-2 rounded-md"
+            className="hover:bg-neutral-500/20 px-2 rounded-md"
             onClick={() =>
               openDialog({ type: "edit-col", columnId: column.id })
             }
@@ -81,7 +82,7 @@ const Column = (props: ColumnProps) => {
           <button
             className={
               props.canDelete()
-                ? `${FADE_CSS} group-hover/column:opacity-30  justify-self-end col-start-3`
+                ? `${FADE_CSS} group-hover/column:opacity-30`
                 : "hidden"
             }
             onClick={() => props.onDelete()}

@@ -71,7 +71,7 @@ const Column = (props: ColumnProps) => {
           {/*   <FaGripVertical /> */}
           {/* </button> */}
           <div
-            className="justify-self-center col-start-2"
+            className="justify-self-center col-start-2 hover:bg-neutral-500/20 px-2 rounded-md"
             onClick={() =>
               openDialog({ type: "edit-col", columnId: column.id })
             }
@@ -94,7 +94,7 @@ const Column = (props: ColumnProps) => {
             <li
               key={x.id}
               className={`flex justify-between gap-2 rounded-lg py-1 px-2 md:py-2 md:px-4
-                shadow-md group/row ${rowBgCss(x.value)}`}
+                shadow-md group/row ${rowBgCss(x.value)} hover:scale-[102%] hover:cursor-pointer`}
               onClick={(e) => {
                 if (e.target == e.currentTarget) {
                   openDialog({
